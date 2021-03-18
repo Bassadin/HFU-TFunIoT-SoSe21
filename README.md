@@ -1,2 +1,2 @@
-# HFU-TFunIoT-SoSe21
-Repository für "Fundamentals of IoT"
+# Fundamentals of IoT
+Repository für "Fundamentals of IoT" bei Gabriel Rausch
