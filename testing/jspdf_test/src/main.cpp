@@ -2,10 +2,15 @@
 #include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
 
-const char *ssid = "**************";
-const char *password = "************";
+const char *ssid = "ESP32 Goodness";
+const char *password = NULL;
 
 AsyncWebServer server(80);
+
+// Use this IP adress after connecting to the AP
+IPAddress local_ip(192, 168, 1, 1);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
 
 void setup()
 {
@@ -17,17 +22,23 @@ void setup()
     return;
   }
 
-  WiFi.begin(ssid, password);
+  // Connect to Wi-Fi network with SSID and password
+  Serial.print("Setting AP (Access Point)…");
 
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(1000);
-    Serial.println("Connecting to WiFi..");
-  }
+  // Setup soft ap
+  // WiFi.hostname("esp_demo"); //This does not work as of yet
+  WiFi.softAP(ssid, password);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+
+  IPAddress IP = WiFi.softAPIP();
+  Serial.print("AP IP address: ");
+  Serial.println(IP);
+
+  server.begin();
 
   Serial.println(WiFi.localIP());
 
-  server.on("/html", HTTP_GET, [](AsyncWebServerRequest *request) {
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(SPIFFS, "/index.html", "text/html");
   });
 
