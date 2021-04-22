@@ -69,7 +69,10 @@ void setup()
 
   Serial.println(WiFi.localIP());
 
-  server.serveStatic("/", SPIFFS, "/").setCacheControl("max-age=600");
+  server
+      .serveStatic("/", SPIFFS, "/")
+      .setCacheControl("max-age=600")
+      .setDefaultFile("index.html");
 
   //Connection handlers
   server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
