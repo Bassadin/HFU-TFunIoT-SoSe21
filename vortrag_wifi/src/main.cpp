@@ -1,9 +1,13 @@
 #include "WiFi.h"
 #include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
+#include <DNSServer.h>
+#include <ESPmDNS.h>
 
 const char *ssid = "ESP32 Goodness";
 const char *password = NULL;
+const byte DNS_PORT = 53;
+DNSServer dnsServer;
 
 AsyncWebServer server(80);
 
@@ -16,6 +20,11 @@ IPAddress subnet(255, 255, 255, 0);
 
 void setup()
 {
+  // Setup soft ap
+  // WiFi.hostname("esp_demo"); //This does not work as of yet
+  WiFi.softAP(ssid, password);
+  WiFi.softAPConfig(local_ip, gateway, subnet);
+
   pinMode(LED_PIN, OUTPUT);
 
   Serial.begin(115200);
@@ -26,13 +35,13 @@ void setup()
     return;
   }
 
+  //DNS Server setup
+  dnsServer.setTTL(300);
+  dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
+  dnsServer.start(DNS_PORT, "www.example.com", local_ip);
+
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Setting AP (Access Point)…");
-
-  // Setup soft ap
-  // WiFi.hostname("esp_demo"); //This does not work as of yet
-  WiFi.softAP(ssid, password);
-  WiFi.softAPConfig(local_ip, gateway, subnet);
 
   IPAddress IP = WiFi.softAPIP();
   Serial.print("AP IP address: ");
@@ -67,4 +76,7 @@ void setup()
   server.begin();
 }
 
-void loop() {}
+void loop()
+{
+  dnsServer.processNextRequest();
+}
