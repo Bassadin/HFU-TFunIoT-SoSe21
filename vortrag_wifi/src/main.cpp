@@ -12,11 +12,28 @@ DNSServer dnsServer;
 AsyncWebServer server(80);
 
 // Use this IP adress after connecting to the AP
-IPAddress local_ip(192, 168, 1, 1);
+IPAddress local_ip(192, 168, 4, 1);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
 #define LED_PIN 19
+
+class CaptiveRequestHandler : public AsyncWebHandler
+{
+public:
+  CaptiveRequestHandler() {}
+  virtual ~CaptiveRequestHandler() {}
+
+  bool canHandle(AsyncWebServerRequest *request)
+  {
+    return true;
+  }
+
+  void handleRequest(AsyncWebServerRequest *request)
+  {
+    request->redirect("/index.html");
+  }
+};
 
 void setup()
 {
@@ -38,7 +55,8 @@ void setup()
   //DNS Server setup
   dnsServer.setTTL(300);
   dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
-  dnsServer.start(DNS_PORT, "www.example.com", local_ip);
+  // dnsServer.start(DNS_PORT, "www.example.com", local_ip);
+  dnsServer.start(DNS_PORT, "*", local_ip);
 
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Setting AP (Access Point)…");
@@ -51,16 +69,12 @@ void setup()
 
   Serial.println(WiFi.localIP());
 
+  server.serveStatic("/", SPIFFS, "/").setCacheControl("max-age=600");
+
+  //Connection handlers
+  server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/index.html", "text/html");
-  });
-
-  server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/script.js", "text/javascript");
-  });
-
-  server.on("/styles.css", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/styles.css", "text/css");
+    request->redirect("/index.html");
   });
 
   server.on("/led/on", HTTP_GET, [](AsyncWebServerRequest *request) {
