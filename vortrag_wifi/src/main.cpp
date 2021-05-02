@@ -6,14 +6,15 @@
 
 const char *ssid = "ESP32 Goodness";
 const char *password = NULL;
+
+//DNS
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
 
 AsyncWebServer server(80);
 
 // Use this IP adress after connecting to the AP
-IPAddress local_ip(192, 168, 4, 1);
-IPAddress gateway(192, 168, 1, 1);
+IPAddress accessPointIP(192, 168, 4, 1);
 IPAddress subnet(255, 255, 255, 0);
 
 #define LED_PIN 19
@@ -21,92 +22,71 @@ IPAddress subnet(255, 255, 255, 0);
 class CaptiveRequestHandler : public AsyncWebHandler
 {
 public:
-  CaptiveRequestHandler() {}
-  virtual ~CaptiveRequestHandler() {}
+    CaptiveRequestHandler() {}
+    virtual ~CaptiveRequestHandler() {}
 
-  bool canHandle(AsyncWebServerRequest *request)
-  {
-    return true;
-  }
+    bool canHandle(AsyncWebServerRequest *request)
+    {
+        return true;
+    }
 
-  void handleRequest(AsyncWebServerRequest *request)
-  {
-    request->send(SPIFFS, "/index.html", "text/html");
-  }
+    void handleRequest(AsyncWebServerRequest *request)
+    {
+        request->send(SPIFFS, "/index.html", "text/html");
+    }
 };
 
 void setup()
 {
-  // Setup soft ap
-  // WiFi.hostname("esp_demo"); //This does not work as of yet
-  WiFi.softAP(ssid, password);
-  WiFi.softAPConfig(local_ip, gateway, subnet);
+    WiFi.mode(WIFI_AP);
+    WiFi.softAP(ssid, password);
+    WiFi.softAPConfig(accessPointIP, accessPointIP, subnet);
 
-  pinMode(LED_PIN, OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
 
-  Serial.begin(115200);
+    Serial.begin(115200);
 
-  if (!SPIFFS.begin())
-  {
-    Serial.println("An Error has occurred while mounting SPIFFS");
-    return;
-  }
+    if (!SPIFFS.begin())
+    {
+        Serial.println("An Error has occurred while mounting SPIFFS");
+        return;
+    }
 
-  //DNS Server setup
-  dnsServer.setTTL(300);
-  dnsServer.setErrorReplyCode(DNSReplyCode::ServerFailure);
-  // dnsServer.start(DNS_PORT, "www.example.com", local_ip);
-  dnsServer.start(DNS_PORT, "*", local_ip);
+    //DNS Server setup
+    dnsServer.setTTL(300);
+    dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+    dnsServer.start(DNS_PORT, "*", accessPointIP);
+    Serial.println("DNS server started");
 
-  // Connect to Wi-Fi network with SSID and password
-  Serial.print("Setting AP (Access Point)…");
+    // Connect to Wi-Fi network with SSID and password
+    Serial.println("Setting AP (Access Point)…");
+    server
+        .serveStatic("/", SPIFFS, "/")
+        .setDefaultFile("index.html");
 
-  IPAddress IP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(IP);
+    //Connection handlers
+    server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
-  server.begin();
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+        request->redirect("/index.html");
+    });
 
-  Serial.println(WiFi.localIP());
+    server.on("/led/on", HTTP_GET, [](AsyncWebServerRequest *request) {
+        Serial.println("Switching LED on");
+        digitalWrite(LED_PIN, HIGH);
+    });
 
-  // server
-  //     .serveStatic("/", SPIFFS, "/")
-  //     .setCacheControl("max-age=600")
-  //     .setDefaultFile("index.html");
+    server.on("/led/off", HTTP_GET, [](AsyncWebServerRequest *request) {
+        Serial.println("Switching LED off");
+        digitalWrite(LED_PIN, LOW);
+    });
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/index.html", "text/html");
-  });
-
-  server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/script.js", "text/javascript");
-  });
-
-  server.on("/styles.css", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(SPIFFS, "/styles.css", "text/css");
-  });
-
-  //Connection handlers
-  server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
-
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->redirect("/index.html");
-  });
-
-  server.on("/led/on", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("Switching LED on");
-    digitalWrite(LED_PIN, HIGH);
-  });
-
-  server.on("/led/off", HTTP_GET, [](AsyncWebServerRequest *request) {
-    Serial.println("Switching LED off");
-    digitalWrite(LED_PIN, LOW);
-  });
-
-  server.begin();
+    Serial.println("Starting server...");
+    server.begin();
+    Serial.println("Setup done.");
 }
 
 void loop()
 {
-  dnsServer.processNextRequest();
+    dnsServer.processNextRequest();
 }
