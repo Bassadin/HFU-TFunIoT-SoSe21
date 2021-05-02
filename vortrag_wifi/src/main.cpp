@@ -31,7 +31,7 @@ public:
 
   void handleRequest(AsyncWebServerRequest *request)
   {
-    request->redirect("/index.html");
+    request->send(SPIFFS, "/index.html", "text/html");
   }
 };
 
@@ -69,13 +69,26 @@ void setup()
 
   Serial.println(WiFi.localIP());
 
-  server
-      .serveStatic("/", SPIFFS, "/")
-      .setCacheControl("max-age=600")
-      .setDefaultFile("index.html");
+  // server
+  //     .serveStatic("/", SPIFFS, "/")
+  //     .setCacheControl("max-age=600")
+  //     .setDefaultFile("index.html");
+
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/index.html", "text/html");
+  });
+
+  server.on("/script.js", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/script.js", "text/javascript");
+  });
+
+  server.on("/styles.css", HTTP_GET, [](AsyncWebServerRequest *request) {
+    request->send(SPIFFS, "/styles.css", "text/css");
+  });
 
   //Connection handlers
   server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
+
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->redirect("/index.html");
   });
