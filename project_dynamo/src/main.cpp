@@ -4,7 +4,7 @@
 #include <DNSServer.h>
 #include <ESPmDNS.h>
 
-const char *ssid = "ESP32 Goodness";
+const char *ssid = "teste-deine-kraft";
 const char *password = NULL;
 
 //DNS
