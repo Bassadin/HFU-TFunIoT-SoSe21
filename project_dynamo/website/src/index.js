@@ -1,7 +1,10 @@
-import "./styles/styles.css";
+//Styles
+import "./styles/styles.scss";
+
+//JsPDF library
 import { jsPDF } from "jspdf";
 
-//#region main
+//#region Buttons
 document.querySelector("#led-on-button").addEventListener("click", () => {
     console.log("Turning LED ON");
     fetch("/led/on");
@@ -17,4 +20,4 @@ document.querySelector("#pdf-button").addEventListener("click", () => {
     doc.text("Hello world!", 10, 10);
     doc.save("urkunde.pdf");
 });
-//#endregion main
+//#endregion Buttons
