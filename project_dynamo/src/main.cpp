@@ -19,22 +19,22 @@ IPAddress subnet(255, 255, 255, 0);
 
 #define LED_PIN 19
 
-class CaptiveRequestHandler : public AsyncWebHandler
-{
-public:
-    CaptiveRequestHandler() {}
-    virtual ~CaptiveRequestHandler() {}
+// class CaptiveRequestHandler : public AsyncWebHandler
+// {
+// public:
+//     CaptiveRequestHandler() {}
+//     virtual ~CaptiveRequestHandler() {}
 
-    bool canHandle(AsyncWebServerRequest *request)
-    {
-        return true;
-    }
+//     bool canHandle(AsyncWebServerRequest *request)
+//     {
+//         return true;
+//     }
 
-    void handleRequest(AsyncWebServerRequest *request)
-    {
-        request->send(SPIFFS, "/index.html", "text/html");
-    }
-};
+//     void handleRequest(AsyncWebServerRequest *request)
+//     {
+//         request->send(SPIFFS, "/index.html", "text/html");
+//     }
+// };
 
 void setup()
 {
@@ -65,7 +65,7 @@ void setup()
         .setDefaultFile("index.html");
 
     //Connection handlers
-    server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
+    // server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->redirect("/index.html");
