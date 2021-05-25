@@ -1,0 +1,43 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Roboto, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 0;
+}
+
+.button-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+button {
+    padding: 1.5rem 2.5rem;
+    border-radius: 0.4em;
+    border: 2px black solid;
+    box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.7);
+    font-weight: bold;
+    color: white;
+    font-size: 1em;
+}
+
+#led-on-button {
+    background-color: darkgreen;
+}
+
+#led-off-button {
+    background-color: darkred;
+}
