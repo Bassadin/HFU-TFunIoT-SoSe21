@@ -15,7 +15,7 @@ document.querySelector("#led-off-button").addEventListener("click", () => {
 });
 
 document.querySelector("#pdf-button").addEventListener("click", () => {
-    const doc = new jsPDF();
+    const doc: jsPDF = new jsPDF();
 
     doc.text("Hello world!", 10, 10);
     doc.save("urkunde.pdf");
