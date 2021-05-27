@@ -17,24 +17,51 @@ AsyncWebServer server(80);
 IPAddress accessPointIP(192, 168, 4, 1);
 IPAddress subnet(255, 255, 255, 0);
 
-#define LED_PIN 19
+//LEDs
 
-// class CaptiveRequestHandler : public AsyncWebHandler
-// {
-// public:
-//     CaptiveRequestHandler() {}
-//     virtual ~CaptiveRequestHandler() {}
+//red
+const int LED_PIN_R1 = 33;
+const int LED_PIN_R2 = 25;
+//yellow
+const int LED_PIN_Y1 = 26;
+const int LED_PIN_Y2 = 27;
+//green
+const int LED_PIN_G1 = 14;
+const int LED_PIN_G2 = 12;
 
-//     bool canHandle(AsyncWebServerRequest *request)
-//     {
-//         return true;
-//     }
+//pin array
+const int ledPinsSize = 6;
+const int led_pins[6] = {LED_PIN_R1, LED_PIN_R2, LED_PIN_Y1, LED_PIN_Y2, LED_PIN_G1, LED_PIN_G2};
 
-//     void handleRequest(AsyncWebServerRequest *request)
-//     {
-//         request->send(SPIFFS, "/index.html", "text/html");
-//     }
-// };
+//Other pins
+
+const int BUTTON_PIN = 16;
+const int BUZZER_PIN = 17;
+
+class CaptiveRequestHandler : public AsyncWebHandler
+{
+public:
+    CaptiveRequestHandler() {}
+    virtual ~CaptiveRequestHandler() {}
+
+    bool canHandle(AsyncWebServerRequest *request)
+    {
+        return true;
+    }
+
+    void handleRequest(AsyncWebServerRequest *request)
+    {
+        request->send(SPIFFS, "/captivePortalRedirect.html", "text/html");
+    }
+};
+
+void setNumberOfLEDsToLightUp(unsigned int ledNumber)
+{
+    for (int i = 0; i < ledPinsSize; i++)
+    {
+        digitalWrite(led_pins[i], i < ledNumber ? HIGH : LOW);
+    }
+}
 
 void setup()
 {
@@ -42,10 +69,23 @@ void setup()
     WiFi.softAP(ssid, password);
     WiFi.softAPConfig(accessPointIP, accessPointIP, subnet);
 
-    pinMode(LED_PIN, OUTPUT);
+    //Initialize LED pins
+    for (int currentPin : led_pins)
+    {
+        pinMode(currentPin, OUTPUT);
+    }
 
+    //Initialize other pins
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    pinMode(BUZZER_PIN, OUTPUT);
+
+    //Test led method
+    setNumberOfLEDsToLightUp(5);
+
+    //Initalize serial connection
     Serial.begin(115200);
 
+    //Initialize SPIFFS
     if (!SPIFFS.begin())
     {
         Serial.println("An Error has occurred while mounting SPIFFS");
@@ -65,20 +105,10 @@ void setup()
         .setDefaultFile("index.html");
 
     //Connection handlers
-    // server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
+    server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
         request->redirect("/index.html");
-    });
-
-    server.on("/led/on", HTTP_GET, [](AsyncWebServerRequest *request) {
-        Serial.println("Switching LED on");
-        digitalWrite(LED_PIN, HIGH);
-    });
-
-    server.on("/led/off", HTTP_GET, [](AsyncWebServerRequest *request) {
-        Serial.println("Switching LED off");
-        digitalWrite(LED_PIN, LOW);
     });
 
     Serial.println("Starting server...");
