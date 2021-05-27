@@ -3,14 +3,15 @@
 #include "ESPAsyncWebServer.h"
 #include <DNSServer.h>
 #include <ESPmDNS.h>
+#include <EasyButton.h>
 
+//Wifi settings
 const char *ssid = "teste-deine-kraft";
 const char *password = NULL;
 
 //DNS
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
-
 AsyncWebServer server(80);
 
 // Use this IP adress after connecting to the AP
@@ -33,10 +34,13 @@ const int LED_PIN_G2 = 12;
 const int ledPinsSize = 6;
 const int led_pins[6] = {LED_PIN_R1, LED_PIN_R2, LED_PIN_Y1, LED_PIN_Y2, LED_PIN_G1, LED_PIN_G2};
 
-//Other pins
+int currentLedCounter = 0;
 
+//Other pins
 const int BUTTON_PIN = 16;
 const int BUZZER_PIN = 17;
+
+EasyButton easyButtonButton(BUTTON_PIN);
 
 class CaptiveRequestHandler : public AsyncWebHandler
 {
@@ -63,6 +67,17 @@ void setNumberOfLEDsToLightUp(unsigned int ledNumber)
     }
 }
 
+void onButtonPressed()
+{
+    if (currentLedCounter < ledPinsSize) {
+        currentLedCounter++;
+    }
+    else {
+        currentLedCounter = 0;
+    }
+    setNumberOfLEDsToLightUp(currentLedCounter);
+}
+
 void setup()
 {
     WiFi.mode(WIFI_AP);
@@ -76,7 +91,10 @@ void setup()
     }
 
     //Initialize other pins
-    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    // pinMode(BUTTON_PIN, INPUT_PULLUP);
+    easyButtonButton.begin();
+    easyButtonButton.onPressed(onButtonPressed);
+
     pinMode(BUZZER_PIN, OUTPUT);
 
     //Test led method
@@ -119,4 +137,5 @@ void setup()
 void loop()
 {
     dnsServer.processNextRequest();
+    easyButtonButton.read();
 }
