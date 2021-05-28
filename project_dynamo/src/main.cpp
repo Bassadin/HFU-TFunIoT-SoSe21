@@ -91,7 +91,6 @@ void setup()
     }
 
     //Initialize other pins
-    // pinMode(BUTTON_PIN, INPUT_PULLUP);
     easyButtonButton.begin();
     easyButtonButton.onPressed(onButtonPressed);
 
