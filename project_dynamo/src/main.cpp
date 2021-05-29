@@ -85,19 +85,22 @@ void setup()
     Serial.begin(9600);
 
     //Set up wifi
+    Serial.println("Setting up WiFi AP");
     WiFi.mode(WIFI_AP);
     WiFi.softAP(ssid, password);
     WiFi.softAPConfig(accessPointIP, accessPointIP, subnet);
 
     //Initialize LED pins
+    Serial.println("Initializing LED pins");
     for (int currentPin : led_pins)
     {
         pinMode(currentPin, OUTPUT);
     }
 
     //Initialize other pins
+    Serial.println("Initializing other pins");
     easyButtonButton.begin();
-    easyButtonButton.onPressed(onButtonPressed);
+    // easyButtonButton.onPressed(onButtonPressed);
 
     pinMode(BUZZER_PIN, OUTPUT);
 
@@ -113,6 +116,7 @@ void setup()
     }
 
     //DNS Server setup
+    Serial.println("Starting DNS server");
     dnsServer.setTTL(300);
     dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
     dnsServer.start(DNS_PORT, "*", accessPointIP);
@@ -124,7 +128,7 @@ void setup()
         .serveStatic("/", SPIFFS, "/")
         .setDefaultFile("index.html");
 
-    //Connection handlers
+    //Captive portal connection handlers
     server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
