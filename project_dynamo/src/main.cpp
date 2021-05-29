@@ -32,7 +32,7 @@ const int LED_PIN_G2 = 12;
 
 //pin array
 const int ledPinsSize = 6;
-const int led_pins[6] = {LED_PIN_R1, LED_PIN_R2, LED_PIN_Y1, LED_PIN_Y2, LED_PIN_G1, LED_PIN_G2};
+const int led_pins[ledPinsSize] = {LED_PIN_R1, LED_PIN_R2, LED_PIN_Y1, LED_PIN_Y2, LED_PIN_G1, LED_PIN_G2};
 
 int currentLedCounter = 0;
 
@@ -75,11 +75,16 @@ void onButtonPressed()
     else {
         currentLedCounter = 0;
     }
+    Serial.println("Setting LED count to: " + currentLedCounter);
     setNumberOfLEDsToLightUp(currentLedCounter);
 }
 
 void setup()
 {
+    //Initalize serial connection
+    Serial.begin(9600);
+
+    //Set up wifi
     WiFi.mode(WIFI_AP);
     WiFi.softAP(ssid, password);
     WiFi.softAPConfig(accessPointIP, accessPointIP, subnet);
@@ -99,8 +104,6 @@ void setup()
     //Test led method
     setNumberOfLEDsToLightUp(5);
 
-    //Initalize serial connection
-    Serial.begin(115200);
 
     //Initialize SPIFFS
     if (!SPIFFS.begin())
