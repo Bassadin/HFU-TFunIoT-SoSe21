@@ -1,18 +1,16 @@
-#include "WiFi.h"
 #include "SPIFFS.h"
 #include "ESPAsyncWebServer.h"
-#include <DNSServer.h>
-#include <ESPmDNS.h>
-#include <EasyButton.h>
 #include <Ticker.h>
-
 #include <deque>
 
 //Wifi settings
+#include "WiFi.h"
 const char *ssid = "teste-deine-kraft";
 const char *password = NULL;
 
 //DNS
+#include <DNSServer.h>
+#include <ESPmDNS.h>
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
 AsyncWebServer server(80);
@@ -45,9 +43,17 @@ const int BUTTON_PIN = 4;
 const int BUZZER_PIN = 17;
 const int DYNAMO_MEASUREMENT_PIN = 35;
 
+#include <EasyButton.h>
 EasyButton easyButtonButton(BUTTON_PIN);
 
 #pragma endregion Pin Settings
+
+//Melody player settings
+#include <melody_player.h>
+#include <melody_factory.h>
+MelodyPlayer player(BUZZER_PIN, LOW);
+
+String notes[] = {"C3", "F3", "A3", "C4", "A3", "C4", "C4", "C4"};
 
 //Deep sleep timer
 Ticker goToDeepSleepTimer;
@@ -183,6 +189,13 @@ void setup()
 {
     //Initalize serial connection
     Serial.begin(9600);
+    while (!Serial)
+        ;
+
+    // Load and play a correct melody
+    Melody melody = MelodyFactory.load("Victory tune", 140, notes, 8);
+
+    player.playAsync(melody);
 
     //Set up external wake source
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);
