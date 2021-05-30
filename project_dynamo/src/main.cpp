@@ -40,7 +40,7 @@ const int led_pins[ledPinsSize] = {LED_PIN_R1, LED_PIN_R2, LED_PIN_Y1, LED_PIN_Y
 int currentLedCounter = 0;
 
 //Other pins
-const int BUTTON_PIN = 16;
+const int BUTTON_PIN = 4;
 const int BUZZER_PIN = 17;
 const int DYNAMO_MEASUREMENT_PIN = 35;
 
