@@ -6,6 +6,8 @@
 #include <EasyButton.h>
 #include <Ticker.h>
 
+#include <deque>
+
 //Wifi settings
 const char *ssid = "teste-deine-kraft";
 const char *password = NULL;
@@ -46,6 +48,8 @@ EasyButton easyButtonButton(BUTTON_PIN);
 
 //Deep sleep timer
 Ticker goToDeepSleepTimer;
+
+unsigned long espStartTime;
 
 class CaptiveRequestHandler : public AsyncWebHandler
 {
@@ -91,13 +95,8 @@ void goToDeepSleep()
     esp_deep_sleep_start();
 }
 
-void handleEndGame()
+void setupWiFiAndWebServer()
 {
-    setupWiFiAndWebServer;
-    goToDeepSleepTimer.once(120, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
-}
-
-void setupWiFiAndWebServer() {
     //Set up wifi
     Serial.println("Setting up WiFi AP");
     WiFi.mode(WIFI_AP);
@@ -135,11 +134,19 @@ void setupWiFiAndWebServer() {
     Serial.println("Setup done.");
 }
 
+void handleEndGame()
+{
+    setupWiFiAndWebServer();
+    goToDeepSleepTimer.once(120, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
+}
+
 void setup()
 {
     //Initalize serial connection
     Serial.begin(9600);
 
+    //Set up external wake source
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);
 
     //Initialize LED pins
     Serial.println("Initializing LED pins");
@@ -157,18 +164,107 @@ void setup()
 
     pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
 
+    espStartTime = millis();
+
     handleEndGame();
 }
 
 const int maxMeasurementVoltage = 2200;
+const int gameEndMillivoltsThreshold = 1100;
+
+enum GameState
+{
+    gameRunning,
+    hostingWebpageForHighscore,
+    warmingUp
+};
+GameState currentGameState = warmingUp;
+
+std::deque<int> measurementDeque;
+const int maxDequeSize = 15;
+
+int handleMeasurementQueueForAverageValue(int newMeasurementValue)
+{
+    int millivoltsDynamoMeasurement = analogReadMilliVolts(DYNAMO_MEASUREMENT_PIN);
+    measurementDeque.push_front(millivoltsDynamoMeasurement);
+
+    if (measurementDeque.size() < 5)
+    {
+        return newMeasurementValue;
+    }
+
+    if (measurementDeque.size() > maxDequeSize)
+    {
+        measurementDeque.pop_back();
+    }
+
+    int dequeSum = 0;
+    for (int i : measurementDeque)
+    {
+        dequeSum += i;
+    }
+
+    return dequeSum / measurementDeque.size();
+}
+
+int gameWarmingUpLEDCounter = 6;
+unsigned long gameWarmupTimout = 1500;
+unsigned long gameWarmupTimer = 0;
+
+void changeGameState(GameState newGameState)
+{
+    currentGameState = newGameState;
+}
 
 void loop()
 {
-    dnsServer.processNextRequest();
     easyButtonButton.read();
 
-    int ledIndex = ceil((analogReadMilliVolts(DYNAMO_MEASUREMENT_PIN) / maxMeasurementVoltage) * ledPinsSize);
-    Serial.println(ledIndex);
+    int currentElapsedTime = espStartTime - millis();
 
-    setNumberOfLEDsToLightUp(ledIndex);
+    switch (currentGameState)
+    {
+    case gameRunning:
+    {
+        int millivoltsDynamoMeasurement = analogReadMilliVolts(DYNAMO_MEASUREMENT_PIN);
+        int averagedMeasurement = handleMeasurementQueueForAverageValue(millivoltsDynamoMeasurement);
+
+        if (currentElapsedTime > 3500 && averagedMeasurement <= gameEndMillivoltsThreshold)
+        {
+            changeGameState(hostingWebpageForHighscore);
+            setNumberOfLEDsToLightUp(0);
+            handleEndGame();
+        }
+
+        int ledIndex = ceil((averagedMeasurement / maxMeasurementVoltage) * ledPinsSize);
+        Serial.println(ledIndex);
+
+        setNumberOfLEDsToLightUp(ledIndex);
+        break;
+    }
+    case warmingUp:
+    {
+        setNumberOfLEDsToLightUp(gameWarmingUpLEDCounter);
+        if (gameWarmingUpLEDCounter > 0)
+        {
+            if (millis() > gameWarmupTimout + gameWarmupTimer)
+            {
+                gameWarmupTimer = millis();
+
+                gameWarmingUpLEDCounter--;
+                setNumberOfLEDsToLightUp(gameWarmingUpLEDCounter);
+            }
+        }
+        else
+        {
+            changeGameState(gameRunning);
+        }
+        break;
+    }
+    case hostingWebpageForHighscore:
+    {
+        dnsServer.processNextRequest();
+        break;
+    }
+    }
 }
