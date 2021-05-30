@@ -65,6 +65,10 @@ int gameWarmingUpLEDCounter = 6;
 unsigned long gameWarmupTimout = 1500;
 unsigned long gameWarmupTimer = 0;
 
+unsigned long ledBlinkTimeout = 750;
+unsigned long ledBlinkTimer = 0;
+bool lastLEDBLinkState = true;
+
 //During game values
 const int maxMeasurementVoltage = 2200;
 const int gameEndMillivoltsThreshold = 1100;
@@ -75,9 +79,9 @@ const int maxDequeSize = 15;
 //State management
 enum GameState
 {
-    gameRunning,
-    hostingWebpageForHighscore,
-    warmingUp
+    gameRunning = 0,
+    hostingWebpageForHighscore = 1,
+    warmingUp = 2
 };
 GameState currentGameState = warmingUp;
 
@@ -182,7 +186,10 @@ int handleMeasurementQueueForAverageValue(int newMeasurementValue)
 
 void changeGameState(GameState newGameState)
 {
+    Serial.print("Switching to new game State: ");
+    Serial.println(newGameState);
     currentGameState = newGameState;
+    //TODO place actions on game state change to happen once herei
 }
 
 void setup()
@@ -217,8 +224,6 @@ void setup()
     pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
 
     espStartTime = millis();
-
-    handleEndGame();
 }
 
 void loop()
@@ -234,6 +239,10 @@ void loop()
         int millivoltsDynamoMeasurement = analogReadMilliVolts(DYNAMO_MEASUREMENT_PIN);
         int averagedMeasurement = handleMeasurementQueueForAverageValue(millivoltsDynamoMeasurement);
 
+        double normalizedMeasurement = averagedMeasurement / (double)maxMeasurementVoltage;
+        if (normalizedMeasurement > 1)
+            normalizedMeasurement = 1;
+
         if (currentElapsedTime > 3500 && averagedMeasurement <= gameEndMillivoltsThreshold)
         {
             changeGameState(hostingWebpageForHighscore);
@@ -241,10 +250,23 @@ void loop()
             handleEndGame();
         }
 
-        int ledIndex = ceil((averagedMeasurement / maxMeasurementVoltage) * ledPinsSize);
-        Serial.println(ledIndex);
+        int ledIndex = ceil(normalizedMeasurement * ledPinsSize);
+        // Serial.println(ledIndex);
 
-        setNumberOfLEDsToLightUp(ledIndex);
+        if (ledIndex == ledPinsSize)
+        {
+            if (millis() > ledBlinkTimeout + ledBlinkTimer)
+            {
+                lastLEDBLinkState = !lastLEDBLinkState;
+                setNumberOfLEDsToLightUp(lastLEDBLinkState ? ledPinsSize : 0);
+                // Serial.println("LED Blink trigger");
+            }
+        }
+        else
+        {
+            setNumberOfLEDsToLightUp(ledIndex);
+        }
+
         break;
     }
     case warmingUp:
@@ -258,10 +280,13 @@ void loop()
 
                 gameWarmingUpLEDCounter--;
                 setNumberOfLEDsToLightUp(gameWarmingUpLEDCounter);
+                Serial.print("Counting down to game start: ");
+                Serial.println(gameWarmingUpLEDCounter);
             }
         }
         else
         {
+            Serial.println("Game starting...");
             changeGameState(gameRunning);
         }
         break;
