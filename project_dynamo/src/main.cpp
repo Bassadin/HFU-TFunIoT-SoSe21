@@ -51,9 +51,10 @@ EasyButton easyButtonButton(BUTTON_PIN);
 //Melody player settings
 #include <melody_player.h>
 #include <melody_factory.h>
-MelodyPlayer player(BUZZER_PIN, LOW);
+MelodyPlayer player(BUZZER_PIN, 0, LOW);
 
 String notes[] = {"C3", "F3", "A3", "C4", "A3", "C4", "C4", "C4"};
+const char melodyString[] = "ff6_victory:d=4,o=5,b=140:32d6,32p,32d6,32p,32d6,32p,d6,a#,c6,16d6,8p,16c6,2d6";
 
 //Deep sleep timer
 Ticker goToDeepSleepTimer;
@@ -192,21 +193,7 @@ void changeGameState(GameState newGameState)
     //TODO place actions on game state change to happen once herei
 }
 
-void setup()
-{
-    //Initalize serial connection
-    Serial.begin(9600);
-    while (!Serial)
-        ;
-
-    // Load and play a correct melody
-    Melody melody = MelodyFactory.load("Victory tune", 140, notes, 8);
-
-    player.playAsync(melody);
-
-    //Set up external wake source
-    esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);
-
+void setupPins() {
     //Initialize LED pins
     Serial.println("Initializing LED pins");
     for (int currentPin : led_pins)
@@ -219,9 +206,28 @@ void setup()
     easyButtonButton.begin();
     // easyButtonButton.onPressed(onButtonPressed);
 
-    pinMode(BUZZER_PIN, OUTPUT);
-
     pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
+}
+
+void setup()
+{
+    //Initalize serial connection
+    Serial.begin(9600);
+    while (!Serial)
+        ;
+
+    // Load and play a correct melody
+    Serial.println("Playing test melody...");
+    Melody melody = MelodyFactory.load("Victory tune", 140, notes, 8);
+
+    Melody melody2 = MelodyFactory.loadRtttlString(melodyString);
+
+    player.playAsync(melody2);
+
+    //Set up external wake source
+    esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 1);
+
+    setupPins();
 
     espStartTime = millis();
 }
