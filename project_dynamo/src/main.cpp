@@ -21,6 +21,7 @@ AsyncWebServer server(80);
 IPAddress accessPointIP(192, 168, 4, 1);
 IPAddress subnet(255, 255, 255, 0);
 
+#pragma region Pin Settings
 //LEDs
 
 //red
@@ -46,10 +47,33 @@ const int DYNAMO_MEASUREMENT_PIN = 35;
 
 EasyButton easyButtonButton(BUTTON_PIN);
 
+#pragma endregion Pin Settings
+
 //Deep sleep timer
 Ticker goToDeepSleepTimer;
 
 unsigned long espStartTime;
+
+//Game warming up led countdown
+int gameWarmingUpLEDCounter = 6;
+unsigned long gameWarmupTimout = 1500;
+unsigned long gameWarmupTimer = 0;
+
+//During game values
+const int maxMeasurementVoltage = 2200;
+const int gameEndMillivoltsThreshold = 1100;
+
+std::deque<int> measurementDeque;
+const int maxDequeSize = 15;
+
+//State management
+enum GameState
+{
+    gameRunning,
+    hostingWebpageForHighscore,
+    warmingUp
+};
+GameState currentGameState = warmingUp;
 
 class CaptiveRequestHandler : public AsyncWebHandler
 {
@@ -74,20 +98,6 @@ void setNumberOfLEDsToLightUp(unsigned int ledNumber)
     {
         digitalWrite(led_pins[i], i < ledNumber ? HIGH : LOW);
     }
-}
-
-void onButtonPressed()
-{
-    if (currentLedCounter < ledPinsSize)
-    {
-        currentLedCounter++;
-    }
-    else
-    {
-        currentLedCounter = 0;
-    }
-    Serial.println("Setting LED count to: " + currentLedCounter);
-    setNumberOfLEDsToLightUp(currentLedCounter);
 }
 
 void goToDeepSleep()
@@ -140,6 +150,35 @@ void handleEndGame()
     goToDeepSleepTimer.once(120, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
 }
 
+int handleMeasurementQueueForAverageValue(int newMeasurementValue)
+{
+    int millivoltsDynamoMeasurement = analogReadMilliVolts(DYNAMO_MEASUREMENT_PIN);
+    measurementDeque.push_front(millivoltsDynamoMeasurement);
+
+    if (measurementDeque.size() < 5)
+    {
+        return newMeasurementValue;
+    }
+
+    if (measurementDeque.size() > maxDequeSize)
+    {
+        measurementDeque.pop_back();
+    }
+
+    int dequeSum = 0;
+    for (int i : measurementDeque)
+    {
+        dequeSum += i;
+    }
+
+    return dequeSum / measurementDeque.size();
+}
+
+void changeGameState(GameState newGameState)
+{
+    currentGameState = newGameState;
+}
+
 void setup()
 {
     //Initalize serial connection
@@ -167,53 +206,6 @@ void setup()
     espStartTime = millis();
 
     handleEndGame();
-}
-
-const int maxMeasurementVoltage = 2200;
-const int gameEndMillivoltsThreshold = 1100;
-
-enum GameState
-{
-    gameRunning,
-    hostingWebpageForHighscore,
-    warmingUp
-};
-GameState currentGameState = warmingUp;
-
-std::deque<int> measurementDeque;
-const int maxDequeSize = 15;
-
-int handleMeasurementQueueForAverageValue(int newMeasurementValue)
-{
-    int millivoltsDynamoMeasurement = analogReadMilliVolts(DYNAMO_MEASUREMENT_PIN);
-    measurementDeque.push_front(millivoltsDynamoMeasurement);
-
-    if (measurementDeque.size() < 5)
-    {
-        return newMeasurementValue;
-    }
-
-    if (measurementDeque.size() > maxDequeSize)
-    {
-        measurementDeque.pop_back();
-    }
-
-    int dequeSum = 0;
-    for (int i : measurementDeque)
-    {
-        dequeSum += i;
-    }
-
-    return dequeSum / measurementDeque.size();
-}
-
-int gameWarmingUpLEDCounter = 6;
-unsigned long gameWarmupTimout = 1500;
-unsigned long gameWarmupTimer = 0;
-
-void changeGameState(GameState newGameState)
-{
-    currentGameState = newGameState;
 }
 
 void loop()
