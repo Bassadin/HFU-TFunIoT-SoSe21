@@ -39,6 +39,7 @@ int currentLedCounter = 0;
 //Other pins
 const int BUTTON_PIN = 16;
 const int BUZZER_PIN = 17;
+const int DYNAMO_MEASUREMENT_PIN = 35;
 
 EasyButton easyButtonButton(BUTTON_PIN);
 
@@ -104,8 +105,10 @@ void setup()
 
     pinMode(BUZZER_PIN, OUTPUT);
 
+    pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
+
     //Test led method
-    setNumberOfLEDsToLightUp(5);
+    // setNumberOfLEDsToLightUp(5);
 
 
     //Initialize SPIFFS
@@ -140,8 +143,15 @@ void setup()
     Serial.println("Setup done.");
 }
 
+const int maxMeasurementVoltage = 2200;
+
 void loop()
 {
     dnsServer.processNextRequest();
     easyButtonButton.read();
+
+    int ledIndex = ceil((analogReadMilliVolts(DYNAMO_MEASUREMENT_PIN) / maxMeasurementVoltage) * ledPinsSize);
+    Serial.println(ledIndex);
+
+    setNumberOfLEDsToLightUp(ledIndex);
 }
