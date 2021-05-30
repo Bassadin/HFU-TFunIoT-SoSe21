@@ -4,6 +4,7 @@
 #include <DNSServer.h>
 #include <ESPmDNS.h>
 #include <EasyButton.h>
+#include <Ticker.h>
 
 //Wifi settings
 const char *ssid = "teste-deine-kraft";
@@ -43,6 +44,9 @@ const int DYNAMO_MEASUREMENT_PIN = 35;
 
 EasyButton easyButtonButton(BUTTON_PIN);
 
+//Deep sleep timer
+Ticker goToDeepSleepTimer;
+
 class CaptiveRequestHandler : public AsyncWebHandler
 {
 public:
@@ -70,46 +74,35 @@ void setNumberOfLEDsToLightUp(unsigned int ledNumber)
 
 void onButtonPressed()
 {
-    if (currentLedCounter < ledPinsSize) {
+    if (currentLedCounter < ledPinsSize)
+    {
         currentLedCounter++;
     }
-    else {
+    else
+    {
         currentLedCounter = 0;
     }
     Serial.println("Setting LED count to: " + currentLedCounter);
     setNumberOfLEDsToLightUp(currentLedCounter);
 }
 
-void setup()
+void goToDeepSleep()
 {
-    //Initalize serial connection
-    Serial.begin(9600);
+    esp_deep_sleep_start();
+}
 
+void handleEndGame()
+{
+    setupWiFiAndWebServer;
+    goToDeepSleepTimer.once(120, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
+}
+
+void setupWiFiAndWebServer() {
     //Set up wifi
     Serial.println("Setting up WiFi AP");
     WiFi.mode(WIFI_AP);
     WiFi.softAP(ssid, password);
     WiFi.softAPConfig(accessPointIP, accessPointIP, subnet);
-
-    //Initialize LED pins
-    Serial.println("Initializing LED pins");
-    for (int currentPin : led_pins)
-    {
-        pinMode(currentPin, OUTPUT);
-    }
-
-    //Initialize other pins
-    Serial.println("Initializing other pins");
-    easyButtonButton.begin();
-    // easyButtonButton.onPressed(onButtonPressed);
-
-    pinMode(BUZZER_PIN, OUTPUT);
-
-    pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
-
-    //Test led method
-    // setNumberOfLEDsToLightUp(5);
-
 
     //Initialize SPIFFS
     if (!SPIFFS.begin())
@@ -134,13 +127,37 @@ void setup()
     //Captive portal connection handlers
     server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-        request->redirect("/index.html");
-    });
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+              { request->redirect("/index.html"); });
 
     Serial.println("Starting server...");
     server.begin();
     Serial.println("Setup done.");
+}
+
+void setup()
+{
+    //Initalize serial connection
+    Serial.begin(9600);
+
+
+    //Initialize LED pins
+    Serial.println("Initializing LED pins");
+    for (int currentPin : led_pins)
+    {
+        pinMode(currentPin, OUTPUT);
+    }
+
+    //Initialize other pins
+    Serial.println("Initializing other pins");
+    easyButtonButton.begin();
+    // easyButtonButton.onPressed(onButtonPressed);
+
+    pinMode(BUZZER_PIN, OUTPUT);
+
+    pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
+
+    handleEndGame();
 }
 
 const int maxMeasurementVoltage = 2200;
