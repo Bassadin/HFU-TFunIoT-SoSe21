@@ -235,9 +235,9 @@ void setup()
 void loop()
 {
     easyButtonButton.read();
-
     int currentElapsedTime = espStartTime - millis();
 
+    //TODO case-states in einzelne methoden/dateien auslagern
     switch (currentGameState)
     {
     case gameRunning:
@@ -265,7 +265,6 @@ void loop()
             {
                 lastLEDBLinkState = !lastLEDBLinkState;
                 setNumberOfLEDsToLightUp(lastLEDBLinkState ? ledPinsSize : 0);
-                // Serial.println("LED Blink trigger");
             }
         }
         else
