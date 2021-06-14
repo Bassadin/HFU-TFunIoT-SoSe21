@@ -45,7 +45,7 @@ void setup()
 
     espStartTime = millis();
 
-    changeGameState(warmingUp);
+    changeGameState(countdown);
 }
 
 void loop()
@@ -89,7 +89,7 @@ void loop()
 
         break;
     }
-    case warmingUp:
+    case countdown:
     {
         setNumberOfLEDsToLightUp(gameWarmingUpLEDCounter);
         if (gameWarmingUpLEDCounter > 0)

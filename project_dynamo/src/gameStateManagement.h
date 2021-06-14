@@ -3,7 +3,7 @@ enum GameState
 {
     gameRunning = 0,
     hostingWebpageForHighscore = 1,
-    warmingUp = 2
+    countdown = 2
 };
 GameState currentGameState;
 
@@ -30,7 +30,7 @@ void changeGameState(GameState newGameState)
         goToDeepSleepTimer.once(120, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
         break;
     }
-    case warmingUp:
+    case countdown:
     {
         player.playAsync(startMelody);
         break;
