@@ -6,12 +6,14 @@
 //Deep sleep
 #include "driver/rtc_io.h"
 Ticker goToDeepSleepTimer;
+RTC_DATA_ATTR int bootCount = 0;
 
-unsigned long espStartTime;
+unsigned long espStartTime = 0;
+unsigned long lastGameStartTime = 0;
 
 //Game warming up led countdown
 int gameWarmingUpLEDCounter = 6;
-unsigned long gameWarmupTimout = 1500;
+unsigned long gameWarmupTimeout = 1500;
 unsigned long gameWarmupTimer = 0;
 
 unsigned long ledBlinkTimeout = 750;
@@ -35,10 +37,20 @@ void setup()
     while (!Serial)
         ;
 
+    //Increment boot number and print it every reboot
+    ++bootCount;
+    Serial.println("Boot number: " + String(bootCount));
+
     //Set up external wake source
     rtc_gpio_pullup_en(GPIO_NUM_4);
     rtc_gpio_pulldown_dis(GPIO_NUM_4);
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);
+
+    if (bootCount == 1) {
+        Serial.println("First boot, going to sleep to wait for button wakeup.");
+        esp_deep_sleep_start();
+    }
+
 
     setupPins();
     loadMelodies();
@@ -51,7 +63,7 @@ void setup()
 void loop()
 {
     easyButtonButton.read();
-    int currentElapsedTime = espStartTime - millis();
+    int elapsedTimeSinceGameStart = millis() - lastGameStartTime;
 
     //TODO case-states in einzelne methoden/dateien auslagern
     switch (currentGameState)
@@ -65,14 +77,13 @@ void loop()
         if (normalizedMeasurement > 1)
             normalizedMeasurement = 1;
 
-        if (currentElapsedTime > 3500 && averagedMeasurement <= gameEndMillivoltsThreshold)
+        if (elapsedTimeSinceGameStart > 3500 && averagedMeasurement <= gameEndMillivoltsThreshold)
         {
+            Serial.print("Game over!");
             changeGameState(hostingWebpageForHighscore);
-            setNumberOfLEDsToLightUp(0);
         }
 
         int ledIndex = ceil(normalizedMeasurement * ledPinsSize);
-        // Serial.println(ledIndex);
 
         if (ledIndex == ledPinsSize)
         {
@@ -94,7 +105,7 @@ void loop()
         setNumberOfLEDsToLightUp(gameWarmingUpLEDCounter);
         if (gameWarmingUpLEDCounter > 0)
         {
-            if (millis() > gameWarmupTimout + gameWarmupTimer)
+            if (millis() > gameWarmupTimeout + gameWarmupTimer)
             {
                 gameWarmupTimer = millis();
 
