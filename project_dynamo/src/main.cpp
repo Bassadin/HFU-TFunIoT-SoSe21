@@ -87,7 +87,7 @@ void loop()
         if (elapsedTimeSinceGameStart > gracePeriodMilliseconds && averagedMeasurement <= gameEndMillivoltsThreshold)
         {
             lastGameDurationMilliseconds = elapsedTimeSinceGameStart;
-            Serial.print("Game over! Score:");
+            Serial.print("Game over! Score: ");
             Serial.println(lastGameDurationMilliseconds);
             player.playAsync(victoryMelody);
             changeGameState(hostingWebpageForHighscore);
