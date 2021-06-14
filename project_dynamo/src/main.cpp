@@ -13,7 +13,7 @@ unsigned long lastGameStartTime = 0;
 
 //Game warming up led countdown
 int gameWarmingUpLEDCounter = 6;
-unsigned long gameWarmupTimeout = 1500;
+unsigned long gameWarmupTimeout = 800;
 unsigned long gameWarmupTimer = 0;
 
 unsigned long ledBlinkTimeout = 750;
@@ -23,6 +23,10 @@ bool lastLEDBLinkState = true;
 //During game values
 const int maxMeasurementVoltage = 2200;
 const int gameEndMillivoltsThreshold = 1100;
+const int gracePeriodMilliseconds = 5000; //The amount of time to wait until low measurement values end the game
+
+//After game values
+int lastGameDurationMilliseconds = 0;
 
 #include "pinSetup.h"
 #include "melodySetup.h"
@@ -46,11 +50,11 @@ void setup()
     rtc_gpio_pulldown_dis(GPIO_NUM_4);
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);
 
-    if (bootCount == 1) {
+    if (bootCount == 1)
+    {
         Serial.println("First boot, going to sleep to wait for button wakeup.");
         esp_deep_sleep_start();
     }
-
 
     setupPins();
     loadMelodies();
@@ -77,9 +81,10 @@ void loop()
         if (normalizedMeasurement > 1)
             normalizedMeasurement = 1;
 
-        if (elapsedTimeSinceGameStart > 3500 && averagedMeasurement <= gameEndMillivoltsThreshold)
+        if (elapsedTimeSinceGameStart > gracePeriodMilliseconds && averagedMeasurement <= gameEndMillivoltsThreshold)
         {
             Serial.print("Game over!");
+            lastGameDurationMilliseconds = elapsedTimeSinceGameStart;
             changeGameState(hostingWebpageForHighscore);
         }
 

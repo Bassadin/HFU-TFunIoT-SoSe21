@@ -9,6 +9,7 @@ GameState currentGameState;
 
 void goToDeepSleep()
 {
+    Serial.println("Going to sleep now.");
     esp_deep_sleep_start();
 }
 
@@ -46,7 +47,7 @@ void changeGameState(GameState newGameState)
     case hostingWebpageForHighscore:
     {
         setupWiFiAndWebServer();
-        Serial.println("Going to sleep...");
+        Serial.println("Going to sleep in 120 seconds");
         goToDeepSleepTimer.once(120, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
         break;
     }

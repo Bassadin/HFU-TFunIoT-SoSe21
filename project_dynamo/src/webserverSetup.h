@@ -14,22 +14,22 @@ AsyncWebServer server(80);
 IPAddress accessPointIP(192, 168, 4, 1);
 IPAddress subnet(255, 255, 255, 0);
 
-class CaptiveRequestHandler : public AsyncWebHandler
-{
-public:
-    CaptiveRequestHandler() {}
-    virtual ~CaptiveRequestHandler() {}
+// class CaptiveRequestHandler : public AsyncWebHandler
+// {
+// public:
+//     CaptiveRequestHandler() {}
+//     virtual ~CaptiveRequestHandler() {}
 
-    bool canHandle(AsyncWebServerRequest *request)
-    {
-        return true;
-    }
+//     bool canHandle(AsyncWebServerRequest *request)
+//     {
+//         return true;
+//     }
 
-    void handleRequest(AsyncWebServerRequest *request)
-    {
-        request->send(SPIFFS, "/captivePortalRedirect.html", "text/html");
-    }
-};
+//     void handleRequest(AsyncWebServerRequest *request)
+//     {
+//         request->send(SPIFFS, "/captivePortalRedirect.html", "text/html");
+//     }
+// };
 
 void setupWiFiAndWebServer()
 {
@@ -60,10 +60,13 @@ void setupWiFiAndWebServer()
         .setDefaultFile("index.html");
 
     //Captive portal connection handlers
-    server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
+    // server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->redirect("/index.html"); });
+
+    server.on("/lastGameScore", HTTP_GET, [](AsyncWebServerRequest *request)
+              { request->send(200, "text/plain", String(lastGameDurationMilliseconds)); });
 
     Serial.println("Starting server...");
     server.begin();

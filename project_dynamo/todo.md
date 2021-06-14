@@ -4,3 +4,4 @@
 - Spiel mit Button starten können
 - Spieldauer speichern
 - Spieldauer-REST-Endpoint bauen
+- Während dem Spiel LEDs hochzählen
