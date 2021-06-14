@@ -3,7 +3,6 @@
 #include <Ticker.h>
 #include <deque>
 
-
 //Deep sleep
 #include "driver/rtc_io.h"
 Ticker goToDeepSleepTimer;
@@ -42,8 +41,11 @@ void setup()
     esp_sleep_enable_ext0_wakeup(GPIO_NUM_4, 0);
 
     setupPins();
+    loadMelodies();
 
     espStartTime = millis();
+
+    changeGameState(warmingUp);
 }
 
 void loop()
@@ -67,7 +69,6 @@ void loop()
         {
             changeGameState(hostingWebpageForHighscore);
             setNumberOfLEDsToLightUp(0);
-            handleEndGame();
         }
 
         int ledIndex = ceil(normalizedMeasurement * ledPinsSize);
@@ -115,5 +116,7 @@ void loop()
         dnsServer.processNextRequest();
         break;
     }
+    default:
+        break;
     }
 }

@@ -3,12 +3,12 @@
 #include <melody_factory.h>
 MelodyPlayer player(BUZZER_PIN, 0, LOW);
 
-String notes[] = {"C3", "F3", "A3", "C4", "A3", "C4", "C4", "C4"};
-const char melodyString[] = "ff6_victory:d=4,o=5,b=140:32d6,32p,32d6,32p,32d6,32p,d6,a#,c6,16d6,8p,16c6,2d6";
+const char victoryMelodyString[] = "victory_jingle:d=4,o=5,b=120:16c5,16f5,16a5,16c6,16p,16a5,4c6.";
+const char startMelodyString[] = "start_shot:d=4,o=5,b=90:4c5,4p,4c5,4p,4c5,4p,2c6";
 
-Melody melody, melody2;
+Melody victoryMelody, startMelody;
 
 void loadMelodies() {
-    melody = MelodyFactory.load("Victory tune", 140, notes, 8);
-    melody2 = MelodyFactory.loadRtttlString(melodyString);
+    victoryMelody = MelodyFactory.loadRtttlString(victoryMelodyString);
+    startMelody = MelodyFactory.loadRtttlString(startMelodyString);
 }
