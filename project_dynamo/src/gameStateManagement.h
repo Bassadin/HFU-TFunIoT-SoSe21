@@ -53,6 +53,7 @@ void changeGameState(GameState newGameState)
     }
     case countdown:
     {
+        gameWarmingUpLEDCounter = 6;
         player.playAsync(startMelody);
         break;
     }

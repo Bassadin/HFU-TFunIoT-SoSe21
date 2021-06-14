@@ -42,7 +42,6 @@ void setupPins()
     //Initialize other pins
     Serial.println("Initializing other pins");
     easyButtonButton.begin();
-    // easyButtonButton.onPressed(onButtonPressed);
 
     pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
 }

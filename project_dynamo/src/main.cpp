@@ -29,9 +29,9 @@ const int gracePeriodMilliseconds = 5000; //The amount of time to wait until low
 int lastGameDurationMilliseconds = 0;
 
 #include "pinSetup.h"
+#include "helpers.h"
 #include "melodySetup.h"
 #include "webserverSetup.h"
-#include "helpers.h"
 #include "gameStateManagement.h"
 
 void setup()
@@ -55,6 +55,9 @@ void setup()
         Serial.println("First boot, going to sleep to wait for button wakeup.");
         esp_deep_sleep_start();
     }
+
+    easyButtonButton.onPressed([]()
+                               { changeGameState(countdown); });
 
     setupPins();
     loadMelodies();
@@ -83,8 +86,10 @@ void loop()
 
         if (elapsedTimeSinceGameStart > gracePeriodMilliseconds && averagedMeasurement <= gameEndMillivoltsThreshold)
         {
-            Serial.print("Game over!");
             lastGameDurationMilliseconds = elapsedTimeSinceGameStart;
+            Serial.print("Game over! Score:");
+            Serial.println(lastGameDurationMilliseconds);
+            player.playAsync(victoryMelody);
             changeGameState(hostingWebpageForHighscore);
         }
 
