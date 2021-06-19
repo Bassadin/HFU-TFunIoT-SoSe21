@@ -19,6 +19,9 @@ const int BUTTON_PIN = 4;
 const int BUZZER_PIN = 17;
 const int DYNAMO_MEASUREMENT_PIN = 35;
 
+const int START_LED_PIN = 13;
+const int END_LED_PIN = 16;
+
 #include <EasyButton.h>
 EasyButton easyButtonButton(BUTTON_PIN);
 
@@ -42,6 +45,12 @@ void setupPins()
     //Initialize other pins
     Serial.println("Initializing other pins");
     easyButtonButton.begin();
+
+    pinMode(START_LED_PIN, OUTPUT);
+    pinMode(END_LED_PIN, OUTPUT);
+
+    // digitalWrite(START_LED_PIN, HIGH);
+    // digitalWrite(END_LED_PIN, HIGH);
 
     pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
 }
