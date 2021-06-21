@@ -49,8 +49,5 @@ void setupPins()
     pinMode(START_LED_PIN, OUTPUT);
     pinMode(END_LED_PIN, OUTPUT);
 
-    // digitalWrite(START_LED_PIN, HIGH);
-    // digitalWrite(END_LED_PIN, HIGH);
-
     pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
 }

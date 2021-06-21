@@ -24,3 +24,13 @@ int handleMeasurementQueueForAverageValue(int newMeasurementValue)
 
     return dequeSum / measurementDeque.size();
 }
+
+void changeStartLedState(bool newState)
+{
+    digitalWrite(START_LED_PIN, HIGH);
+}
+
+void changeEndLedState(bool newState)
+{
+    digitalWrite(END_LED_PIN, HIGH);
+}
