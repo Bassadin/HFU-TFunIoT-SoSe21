@@ -59,13 +59,31 @@ void setupWiFiAndWebServer()
         .setDefaultFile("index.html");
 
     //Captive portal connection handlers
-    server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
+    // server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->redirect("/index.html"); });
 
     server.on("/lastGameScore", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->send(200, "text/plain", String(lastGameDurationMilliseconds)); });
+
+    //Capture requests menat for google servers that check for internet connection
+    server.on("/generate_204", HTTP_ANY, [](AsyncWebServerRequest *request)
+              { request->send(204); });
+
+    server.on("/gen_204", HTTP_ANY, [](AsyncWebServerRequest *request)
+              { request->send(204); });
+
+    server.on("/chrome-variations/seed", HTTP_ANY, [](AsyncWebServerRequest *request)
+              { request->send(204); });
+
+    server.onNotFound([](AsyncWebServerRequest *request)
+                      {
+                          Serial.print(request->host());
+                          Serial.print(" - ");
+                          Serial.println(request->url());
+                          request->send(204);
+                      });
 
     Serial.println("Starting server...");
     server.begin();
