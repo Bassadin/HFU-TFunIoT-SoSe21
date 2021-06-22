@@ -11,25 +11,25 @@ DNSServer dnsServer;
 AsyncWebServer server(80);
 
 // Use this IP adress after connecting to the AP
-IPAddress accessPointIP(192, 168, 4, 1);
+IPAddress accessPointIP(8, 8, 8, 8);
 IPAddress subnet(255, 255, 255, 0);
 
-// class CaptiveRequestHandler : public AsyncWebHandler
-// {
-// public:
-//     CaptiveRequestHandler() {}
-//     virtual ~CaptiveRequestHandler() {}
+class CaptiveRequestHandler : public AsyncWebHandler
+{
+public:
+    CaptiveRequestHandler() {}
+    virtual ~CaptiveRequestHandler() {}
 
-//     bool canHandle(AsyncWebServerRequest *request)
-//     {
-//         return true;
-//     }
+    bool canHandle(AsyncWebServerRequest *request)
+    {
+        return true;
+    }
 
-//     void handleRequest(AsyncWebServerRequest *request)
-//     {
-//         request->send(SPIFFS, "/captivePortalRedirect.html", "text/html");
-//     }
-// };
+    void handleRequest(AsyncWebServerRequest *request)
+    {
+        request->send(SPIFFS, "/index.html", "text/html");
+    }
+};
 
 void setupWiFiAndWebServer()
 {
@@ -60,7 +60,7 @@ void setupWiFiAndWebServer()
         .setDefaultFile("index.html");
 
     //Captive portal connection handlers
-    // server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
+    server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
               { request->redirect("/index.html"); });
