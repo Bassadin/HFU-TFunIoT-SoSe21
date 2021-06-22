@@ -28,12 +28,16 @@ auto endJled = JLed(END_LED_PIN);
 #include <EasyButton.h>
 EasyButton easyButtonButton(BUTTON_PIN);
 
-void setNumberOfLEDsToLightUp(unsigned int ledNumber)
+void setNumberOfPowerMeterLEDsToLightUp(unsigned int ledNumber)
 {
+    Serial.print("Power Meter LEDs state: ");
     for (int i = 0; i < ledPinsSize; i++)
     {
         digitalWrite(led_pins[i], i < ledNumber ? HIGH : LOW);
+        Serial.print(i < ledNumber ? "1" : "0");
+        Serial.print("-");
     }
+    Serial.println(".");
 }
 
 void setupPins()
@@ -55,7 +59,8 @@ void setupPins()
     pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
 }
 
-void updateJleds() {
+void updateJleds()
+{
     startJled.Update();
     endJled.Update();
 }

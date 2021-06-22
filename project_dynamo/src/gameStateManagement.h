@@ -4,7 +4,7 @@ enum GameState
     gameRunning = 0,
     hostingWebpageForHighscore = 1,
     countdown = 2,
-    beforeGameInfo = 3
+    preGameInfo = 3
 };
 GameState currentGameState;
 
@@ -21,15 +21,15 @@ void changeGameState(GameState newGameState)
     {
     case gameRunning:
     {
-        setNumberOfLEDsToLightUp(0);
+        setNumberOfPowerMeterLEDsToLightUp(0);
         break;
     }
     case countdown:
     {
-        setNumberOfLEDsToLightUp(0);
+        setNumberOfPowerMeterLEDsToLightUp(0);
         break;
     }
-    case beforeGameInfo:
+    case preGameInfo:
     {
         changeStartLedState(false);
         break;
@@ -65,12 +65,14 @@ void changeGameState(GameState newGameState)
     }
     case countdown:
     {
-        gameWarmingUpLEDCounter = 6;
+        gameCountdownTimer = millis();
+        gameLEDCountdownCounter = ledPinsSize;
         player.playAsync(startMelody);
         break;
     }
-    case beforeGameInfo:
+    case preGameInfo:
     {
+        preGameInfoTimer = millis();
         changeStartLedState(true);
         break;
     }

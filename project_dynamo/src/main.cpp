@@ -17,11 +17,11 @@ unsigned long preGameInfoTimeout = 5000;
 unsigned long preGameInfoTimer = 0;
 
 //Game warming up led countdown
-int gameWarmingUpLEDCounter = 6;
-unsigned long gameWarmupTimeout = 750;
-unsigned long gameWarmupTimer = 0;
+int gameLEDCountdownCounter = 6;
+unsigned long gameCountdownTimeout = 700;
+unsigned long gameCountdownTimer = 0;
 
-unsigned long ledBlinkTimeout = 750;
+unsigned long ledBlinkTimeout = 200;
 unsigned long ledBlinkTimer = 0;
 bool lastLEDBLinkState = true;
 
@@ -61,16 +61,20 @@ void setup()
         esp_deep_sleep_start();
     }
 
+    goToDeepSleepTimer.once(120, goToDeepSleep);
+
     setupPins();
     loadMelodies();
+
+    
 
     espStartTime = millis();
 
     //Initial game state after wakeup
-    changeGameState(beforeGameInfo);
+    changeGameState(preGameInfo);
 
     easyButtonButton.onPressed([]()
-                               { changeGameState(beforeGameInfo); });
+                               { changeGameState(preGameInfo); });
 }
 
 void loop()
@@ -91,14 +95,6 @@ void loop()
         if (normalizedMeasurement > 1)
             normalizedMeasurement = 1;
 
-        if (elapsedTimeSinceGameStart > gracePeriodMilliseconds && averagedMeasurement <= gameEndMillivoltsThreshold)
-        {
-            lastGameDurationMilliseconds = elapsedTimeSinceGameStart;
-            Serial.print("Game over! Score: ");
-            Serial.println(lastGameDurationMilliseconds);
-            player.playAsync(victoryMelody);
-            changeGameState(hostingWebpageForHighscore);
-        }
 
         int ledIndex = ceil(normalizedMeasurement * ledPinsSize);
 
@@ -108,29 +104,38 @@ void loop()
             {
                 ledBlinkTimer = millis();
                 lastLEDBLinkState = !lastLEDBLinkState;
-                setNumberOfLEDsToLightUp(lastLEDBLinkState ? ledPinsSize : 0);
+                setNumberOfPowerMeterLEDsToLightUp(lastLEDBLinkState ? ledPinsSize : 0);
             }
         }
         else
         {
-            setNumberOfLEDsToLightUp(ledIndex);
+            setNumberOfPowerMeterLEDsToLightUp(ledIndex);
+        }
+
+        if (elapsedTimeSinceGameStart > gracePeriodMilliseconds && averagedMeasurement <= gameEndMillivoltsThreshold)
+        {
+            lastGameDurationMilliseconds = elapsedTimeSinceGameStart;
+            Serial.print("Game over! Score: ");
+            Serial.println(lastGameDurationMilliseconds);
+            player.playAsync(victoryMelody);
+            changeGameState(hostingWebpageForHighscore);
         }
 
         break;
     }
     case countdown:
     {
-        setNumberOfLEDsToLightUp(gameWarmingUpLEDCounter);
-        if (gameWarmingUpLEDCounter > 0)
+        setNumberOfPowerMeterLEDsToLightUp(gameLEDCountdownCounter);
+        if (gameLEDCountdownCounter > 0)
         {
-            if (millis() > gameWarmupTimeout + gameWarmupTimer)
+            if (millis() > gameCountdownTimeout + gameCountdownTimer)
             {
-                gameWarmupTimer = millis();
+                gameCountdownTimer = millis();
 
-                gameWarmingUpLEDCounter--;
-                setNumberOfLEDsToLightUp(gameWarmingUpLEDCounter);
+                gameLEDCountdownCounter--;
+                setNumberOfPowerMeterLEDsToLightUp(gameLEDCountdownCounter);
                 Serial.print("Counting down to game start: ");
-                Serial.println(gameWarmingUpLEDCounter);
+                Serial.println(gameLEDCountdownCounter);
             }
         }
         else
@@ -145,7 +150,7 @@ void loop()
         dnsServer.processNextRequest();
         break;
     }
-    case beforeGameInfo:
+    case preGameInfo:
     {
         if (millis() > preGameInfoTimeout + preGameInfoTimer)
         {
