@@ -5,13 +5,12 @@ const char *password = NULL;
 
 //DNS
 #include <DNSServer.h>
-#include <ESPmDNS.h>
 const byte DNS_PORT = 53;
 DNSServer dnsServer;
 AsyncWebServer server(80);
 
 // Use this IP adress after connecting to the AP
-IPAddress accessPointIP(8, 8, 8, 8);
+IPAddress accessPointIP(192, 168, 4, 1);
 IPAddress subnet(255, 255, 255, 0);
 
 class CaptiveRequestHandler : public AsyncWebHandler
@@ -27,7 +26,7 @@ public:
 
     void handleRequest(AsyncWebServerRequest *request)
     {
-        request->send(SPIFFS, "/index.html", "text/html");
+        request->redirect("/index.html");
     }
 };
 
@@ -36,8 +35,8 @@ void setupWiFiAndWebServer()
     //Set up wifi
     Serial.println("Setting up WiFi AP");
     WiFi.mode(WIFI_AP);
-    WiFi.softAP(ssid, password);
     WiFi.softAPConfig(accessPointIP, accessPointIP, subnet);
+    WiFi.softAP(ssid, password);
 
     //Initialize SPIFFS
     if (!SPIFFS.begin())
@@ -70,5 +69,5 @@ void setupWiFiAndWebServer()
 
     Serial.println("Starting server...");
     server.begin();
-    Serial.println("Setup done.");
+    Serial.println("Webserver setup complete.");
 }
