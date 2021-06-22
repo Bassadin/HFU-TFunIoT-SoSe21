@@ -22,6 +22,9 @@ const int DYNAMO_MEASUREMENT_PIN = 35;
 const int START_LED_PIN = 13;
 const int END_LED_PIN = 16;
 
+auto startJled = JLed(START_LED_PIN);
+auto endJled = JLed(END_LED_PIN);
+
 #include <EasyButton.h>
 EasyButton easyButtonButton(BUTTON_PIN);
 
@@ -46,8 +49,13 @@ void setupPins()
     Serial.println("Initializing other pins");
     easyButtonButton.begin();
 
-    pinMode(START_LED_PIN, OUTPUT);
-    pinMode(END_LED_PIN, OUTPUT);
+    // pinMode(START_LED_PIN, OUTPUT);
+    // pinMode(END_LED_PIN, OUTPUT);
 
     pinMode(DYNAMO_MEASUREMENT_PIN, INPUT);
+}
+
+void updateJleds() {
+    startJled.Update();
+    endJled.Update();
 }

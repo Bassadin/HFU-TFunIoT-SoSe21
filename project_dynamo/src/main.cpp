@@ -2,6 +2,7 @@
 #include "ESPAsyncWebServer.h"
 #include <Ticker.h>
 #include <deque>
+#include <jled.h>
 
 //Deep sleep
 #include "driver/rtc_io.h"
@@ -11,9 +12,13 @@ RTC_DATA_ATTR int bootCount = 0;
 unsigned long espStartTime = 0;
 unsigned long lastGameStartTime = 0;
 
+//Pre game info timer
+unsigned long preGameInfoTimeout = 5000;
+unsigned long preGameInfoTimer = 0;
+
 //Game warming up led countdown
 int gameWarmingUpLEDCounter = 6;
-unsigned long gameWarmupTimeout = 800;
+unsigned long gameWarmupTimeout = 750;
 unsigned long gameWarmupTimer = 0;
 
 unsigned long ledBlinkTimeout = 750;
@@ -56,20 +61,22 @@ void setup()
         esp_deep_sleep_start();
     }
 
-    easyButtonButton.onPressed([]()
-                               { changeGameState(countdown); });
-
     setupPins();
     loadMelodies();
 
     espStartTime = millis();
 
-    changeGameState(countdown);
+    //Initial game state after wakeup
+    changeGameState(beforeGameInfo);
+
+    easyButtonButton.onPressed([]()
+                               { changeGameState(beforeGameInfo); });
 }
 
 void loop()
 {
     easyButtonButton.read();
+    updateJleds();
     int elapsedTimeSinceGameStart = millis() - lastGameStartTime;
 
     //TODO case-states in einzelne methoden/dateien auslagern
@@ -99,6 +106,7 @@ void loop()
         {
             if (millis() > ledBlinkTimeout + ledBlinkTimer)
             {
+                ledBlinkTimer = millis();
                 lastLEDBLinkState = !lastLEDBLinkState;
                 setNumberOfLEDsToLightUp(lastLEDBLinkState ? ledPinsSize : 0);
             }
@@ -135,6 +143,15 @@ void loop()
     case hostingWebpageForHighscore:
     {
         dnsServer.processNextRequest();
+        break;
+    }
+    case beforeGameInfo:
+    {
+        if (millis() > preGameInfoTimeout + preGameInfoTimer)
+        {
+            preGameInfoTimer = millis();
+            changeGameState(countdown);
+        }
         break;
     }
     default:

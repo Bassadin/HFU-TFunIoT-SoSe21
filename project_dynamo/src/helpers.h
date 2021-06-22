@@ -27,10 +27,24 @@ int handleMeasurementQueueForAverageValue(int newMeasurementValue)
 
 void changeStartLedState(bool newState)
 {
-    digitalWrite(START_LED_PIN, HIGH);
+    if (newState)
+    {
+        startJled.Breathe(1000).Forever();
+    }
+    else
+    {
+        startJled.FadeOff(1000).Repeat(1);
+    }
 }
 
 void changeEndLedState(bool newState)
 {
-    digitalWrite(END_LED_PIN, HIGH);
+    if (newState)
+    {
+        endJled.Breathe(1000).Forever();
+    }
+    else
+    {
+        endJled.FadeOff(1000).Repeat(1);
+    }
 }

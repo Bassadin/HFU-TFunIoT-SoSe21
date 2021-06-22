@@ -3,7 +3,8 @@ enum GameState
 {
     gameRunning = 0,
     hostingWebpageForHighscore = 1,
-    countdown = 2
+    countdown = 2,
+    beforeGameInfo = 3
 };
 GameState currentGameState;
 
@@ -28,6 +29,16 @@ void changeGameState(GameState newGameState)
         setNumberOfLEDsToLightUp(0);
         break;
     }
+    case beforeGameInfo:
+    {
+        changeStartLedState(false);
+        break;
+    }
+    case hostingWebpageForHighscore:
+    {
+        changeEndLedState(false);
+        break;
+    }
     default:
         break;
     }
@@ -46,6 +57,7 @@ void changeGameState(GameState newGameState)
     }
     case hostingWebpageForHighscore:
     {
+        changeEndLedState(true);
         setupWiFiAndWebServer();
         Serial.println("Going to sleep in 120 seconds");
         goToDeepSleepTimer.once(120, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
@@ -55,6 +67,11 @@ void changeGameState(GameState newGameState)
     {
         gameWarmingUpLEDCounter = 6;
         player.playAsync(startMelody);
+        break;
+    }
+    case beforeGameInfo:
+    {
+        changeStartLedState(true);
         break;
     }
     default:
