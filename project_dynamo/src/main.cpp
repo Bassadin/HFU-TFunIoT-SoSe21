@@ -61,12 +61,8 @@ void setup()
         esp_deep_sleep_start();
     }
 
-    goToDeepSleepTimer.once(120, goToDeepSleep);
-
     setupPins();
     loadMelodies();
-
-    
 
     espStartTime = millis();
 
