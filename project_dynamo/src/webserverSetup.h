@@ -67,6 +67,7 @@ void setupWiFiAndWebServer()
     server.on("/lastGameScore", HTTP_GET, [](AsyncWebServerRequest *request)
               {
                 request->send(200, "text/plain", String(lastGameDurationMilliseconds));
+                Serial.println("Going to sleep in 30 seconds");
                 goToDeepSleepTimer.once(30, goToDeepSleep); //Faster fall asleep time when request was made
                 });
 
