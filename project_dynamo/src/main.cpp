@@ -13,7 +13,7 @@ unsigned long espStartTime = 0;
 unsigned long lastGameStartTime = 0;
 
 //Pre game info timer
-unsigned long preGameInfoTimeout = 5000;
+unsigned long preGameInfoTimeout = 8000;
 unsigned long preGameInfoTimer = 0;
 
 //Game warming up led countdown
