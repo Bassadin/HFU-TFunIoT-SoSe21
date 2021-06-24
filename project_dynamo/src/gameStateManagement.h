@@ -61,8 +61,8 @@ void changeGameState(GameState newGameState)
     {
         changeEndLedState(true);
         setupWiFiAndWebServer();
-        Serial.println("Going to sleep in 120 seconds");
-        goToDeepSleepTimer.once(120, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
+        Serial.println("Going to sleep in 180 seconds");
+        goToDeepSleepTimer.once(180, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
         break;
     }
     case countdown:
