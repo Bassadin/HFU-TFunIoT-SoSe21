@@ -4,18 +4,17 @@ import "./styles.scss";
 //JsPDF library
 import { jsPDF } from "jspdf";
 
-var zeit = 1000;
+var zeit : number = 1000;
 
 document.querySelector(".download_btn").addEventListener("click", () => {
     date();
     genPDF();
-    console.log("Click");
 });
 
 window.onload = async function () {
     let response = await fetch("/lastGameScore");
     let responseText = await response.text();
-    zeit = parseInt(responseText);
+    zeit = Math.round(parseInt(responseText) / 1000);
 };
 
 function snal() {
