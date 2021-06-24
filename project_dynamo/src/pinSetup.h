@@ -77,9 +77,6 @@ void setNumberOfPowerMeterLEDsToLightUpDynamic(float progressNumber)
                 dutyCycleNumber = 0;
         }
         ledcWrite(i + 5, dutyCycleNumber);
-        if (i == 0) {
-            Serial.printf("first LED duty cycle value =  %i\n", dutyCycleNumber);
-        }
     }
 }
 
