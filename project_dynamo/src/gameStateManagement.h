@@ -8,12 +8,6 @@ enum GameState
 };
 GameState currentGameState;
 
-void goToDeepSleep()
-{
-    Serial.println("Going to sleep now.");
-    esp_deep_sleep_start();
-}
-
 void changeGameState(GameState newGameState)
 {
     //Break down old gamestate

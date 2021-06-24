@@ -48,3 +48,9 @@ void changeEndLedState(bool newState)
         endJled.FadeOff(1000).Repeat(1);
     }
 }
+
+void goToDeepSleep()
+{
+    Serial.println("Going to sleep now.");
+    esp_deep_sleep_start();
+}
