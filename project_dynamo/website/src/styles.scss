@@ -1,0 +1,70 @@
+@charset "utf-8";
+/* CSS Document */
+
+@font-face {
+    font-family: roboto_bold;
+    src: url("fonts/Roboto-Bold.ttf");
+}
+@font-face {
+    font-family: roboto_reg;
+    src: url("fonts/Roboto-Regular.ttf");
+}
+
+body {
+    text-align: center;
+    height: 100%;
+}
+h1 {
+    margin-left: 10px;
+    margin-right: 10px;
+    font-family: roboto_bold;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    width: 50%;
+    right: 0;
+}
+p,
+label {
+    font-family: roboto_reg;
+}
+
+input {
+    margin-top: 15px;
+}
+
+.download_btn {
+    background-color: #008c58;
+    position: relative;
+    padding: 15px;
+    width: 50%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    margin-top: 15px;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-family: roboto_bold;
+}
+#urkunde {
+    position: absolute;
+    width: 100%;
+}
+
+#urkunde h1 {
+    left: 30px;
+}
+
+.felsen-bild {
+    position: absolute;
+    bottom: 0;
+    z-index: -1;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 100%;
+}

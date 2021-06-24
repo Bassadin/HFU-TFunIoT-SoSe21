@@ -32,14 +32,8 @@ module.exports = {
                 },
             },
             {
-                test: /\.(eot|eot?#iefix|woff2|woff|ttf|svg#Alegreya)$/,
-                use: {
-                    loader: "file-loader",
-                    options: {
-                        name: "[name].[ext]",
-                        outputPath: "fonts",
-                    },
-                },
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                type: 'asset/resource',
             },
             {
                 test: /\.tsx?$/,
