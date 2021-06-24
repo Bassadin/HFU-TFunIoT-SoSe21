@@ -12,9 +12,13 @@ document.querySelector(".download_btn").addEventListener("click", () => {
 });
 
 window.onload = async function () {
+    console.log("Zeit vor fetch: " + zeit);
     let response = await fetch("/lastGameScore");
     let responseText = await response.text();
-    zeit = Math.round(parseInt(responseText) / 1000);
+    zeit = parseInt(responseText) / 1000;
+    console.log("Zeit vor round: " + zeit);
+    zeit = Math.round(zeit);
+    console.log("Zeit nach fetch: " + zeit);
 };
 
 function snal() {
