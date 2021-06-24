@@ -30,14 +30,14 @@ EasyButton easyButtonButton(BUTTON_PIN);
 
 void setNumberOfPowerMeterLEDsToLightUp(unsigned int ledNumber)
 {
-    Serial.print("Power Meter LEDs state: ");
+    // Serial.print("Power Meter LEDs state: ");
     for (int i = 0; i < ledPinsSize; i++)
     {
         digitalWrite(led_pins[i], i < ledNumber ? HIGH : LOW);
-        Serial.print(i < ledNumber ? "1" : "0");
-        Serial.print("-");
+        // Serial.print(i < ledNumber ? "1" : "0");
+        // Serial.print("-");
     }
-    Serial.println(".");
+    // Serial.println(".");
 }
 
 void setupPins()
