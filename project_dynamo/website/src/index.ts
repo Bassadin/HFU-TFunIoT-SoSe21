@@ -13,10 +13,9 @@ document.querySelector(".download_btn").addEventListener("click", () => {
 });
 
 window.onload = async function () {
-    let response = await fetch("http:/kraft-test.de/lastGameScore");
+    let response = await fetch("/lastGameScore");
     let responseText = await response.text();
     zeit = parseInt(responseText);
-    zeit = 10000;
 };
 
 function snal() {
