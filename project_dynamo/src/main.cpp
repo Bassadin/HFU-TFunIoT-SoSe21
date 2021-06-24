@@ -77,7 +77,6 @@ void loop()
 {
     easyButtonButton.read();
     updateJleds();
-    int elapsedTimeSinceGameStart = millis() - lastGameStartTime;
 
     //TODO case-states in einzelne methoden/dateien auslagern
     switch (currentGameState)
@@ -86,29 +85,31 @@ void loop()
     {
         int millivoltsDynamoMeasurement = analogReadMilliVolts(DYNAMO_MEASUREMENT_PIN);
         int averagedMeasurement = handleMeasurementQueueForAverageValue(millivoltsDynamoMeasurement);
+        int elapsedTimeSinceGameStart = millis() - lastGameStartTime;
 
         double normalizedMeasurement = averagedMeasurement / (double)maxMeasurementVoltage;
         if (normalizedMeasurement > 1)
             normalizedMeasurement = 1;
 
+        // int ledIndex = ceil(normalizedMeasurement * ledPinsSize);
 
-        int ledIndex = ceil(normalizedMeasurement * ledPinsSize);
+        // if (ledIndex == ledPinsSize)
+        // {
+        //     if (millis() > ledBlinkTimeout + ledBlinkTimer)
+        //     {
+        //         ledBlinkTimer = millis();
+        //         lastLEDBLinkState = !lastLEDBLinkState;
+        //         setNumberOfPowerMeterLEDsToLightUp(lastLEDBLinkState ? ledPinsSize : 0);
+        //     }
+        // }
+        // else
+        // {
+        //     setNumberOfPowerMeterLEDsToLightUp(ledIndex);
+        // }
 
-        if (ledIndex == ledPinsSize)
-        {
-            if (millis() > ledBlinkTimeout + ledBlinkTimer)
-            {
-                ledBlinkTimer = millis();
-                lastLEDBLinkState = !lastLEDBLinkState;
-                setNumberOfPowerMeterLEDsToLightUp(lastLEDBLinkState ? ledPinsSize : 0);
-            }
-        }
-        else
-        {
-            setNumberOfPowerMeterLEDsToLightUp(ledIndex);
-        }
+        setNumberOfPowerMeterLEDsToLightUp(std::floor(elapsedTimeSinceGameStart / 1000 / 10));
 
-        if (elapsedTimeSinceGameStart > gracePeriodMilliseconds && averagedMeasurement <= gameEndMillivoltsThreshold)
+        if ((elapsedTimeSinceGameStart > gracePeriodMilliseconds && averagedMeasurement <= gameEndMillivoltsThreshold) || elapsedTimeSinceGameStart > 60000)
         {
             lastGameDurationMilliseconds = elapsedTimeSinceGameStart;
             Serial.print("Game over! Score: ");
