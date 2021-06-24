@@ -37,6 +37,7 @@ void changeGameState(GameState newGameState)
     case hostingWebpageForHighscore:
     {
         changeEndLedState(false);
+        goToDeepSleepTimer.detach();
         break;
     }
     default:
@@ -61,8 +62,8 @@ void changeGameState(GameState newGameState)
     {
         changeEndLedState(true);
         setupWiFiAndWebServer();
-        Serial.println("Going to sleep in 180 seconds");
-        goToDeepSleepTimer.once(180, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
+        Serial.println("Going to sleep in 240 seconds");
+        goToDeepSleepTimer.once(240, goToDeepSleep); //Go to sleep after 120 seconds/2 minutes
         break;
     }
     case countdown:

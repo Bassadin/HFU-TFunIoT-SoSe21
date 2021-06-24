@@ -65,7 +65,10 @@ void setupWiFiAndWebServer()
               { request->redirect("/index.html"); });
 
     server.on("/lastGameScore", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(200, "text/plain", String(lastGameDurationMilliseconds)); });
+              {
+                request->send(200, "text/plain", String(lastGameDurationMilliseconds));
+                goToDeepSleepTimer.once(30, goToDeepSleep); //Faster fall asleep time when request was made
+                });
 
     //Capture requests menat for google servers that check for internet connection
     server.on("/generate_204", HTTP_ANY, [](AsyncWebServerRequest *request)
