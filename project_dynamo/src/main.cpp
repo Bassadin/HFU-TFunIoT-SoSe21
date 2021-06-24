@@ -99,15 +99,17 @@ void loop()
         //     {
         //         ledBlinkTimer = millis();
         //         lastLEDBLinkState = !lastLEDBLinkState;
-        //         setNumberOfPowerMeterLEDsToLightUp(lastLEDBLinkState ? ledPinsSize : 0);
+        //         setNumberOfPowerMeterLEDsToLightUpStatic(lastLEDBLinkState ? ledPinsSize : 0);
         //     }
         // }
         // else
         // {
-        //     setNumberOfPowerMeterLEDsToLightUp(ledIndex);
+        //     setNumberOfPowerMeterLEDsToLightUpStatic(ledIndex);
         // }
 
-        setNumberOfPowerMeterLEDsToLightUp(std::floor(elapsedTimeSinceGameStart / 1000 / 10));
+        // setNumberOfPowerMeterLEDsToLightUpStatic(std::floor(elapsedTimeSinceGameStart / 1000 / 10));
+
+        setNumberOfPowerMeterLEDsToLightUpDynamic((float)elapsedTimeSinceGameStart / 1000 / 10);
 
         if ((elapsedTimeSinceGameStart > gracePeriodMilliseconds && averagedMeasurement <= gameEndMillivoltsThreshold) || elapsedTimeSinceGameStart > 60000)
         {
@@ -122,7 +124,7 @@ void loop()
     }
     case countdown:
     {
-        setNumberOfPowerMeterLEDsToLightUp(gameLEDCountdownCounter);
+        setNumberOfPowerMeterLEDsToLightUpStatic(gameLEDCountdownCounter);
         if (gameLEDCountdownCounter > 0)
         {
             if (millis() > gameCountdownTimeout + gameCountdownTimer)
@@ -130,7 +132,7 @@ void loop()
                 gameCountdownTimer = millis();
 
                 gameLEDCountdownCounter--;
-                setNumberOfPowerMeterLEDsToLightUp(gameLEDCountdownCounter);
+                setNumberOfPowerMeterLEDsToLightUpStatic(gameLEDCountdownCounter);
                 Serial.print("Counting down to game start: ");
                 Serial.println(gameLEDCountdownCounter);
             }

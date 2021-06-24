@@ -15,12 +15,12 @@ void changeGameState(GameState newGameState)
     {
     case gameRunning:
     {
-        setNumberOfPowerMeterLEDsToLightUp(0);
+        setNumberOfPowerMeterLEDsToLightUpStatic(0);
         break;
     }
     case countdown:
     {
-        setNumberOfPowerMeterLEDsToLightUp(0);
+        setNumberOfPowerMeterLEDsToLightUpStatic(0);
         break;
     }
     case preGameInfo:
