@@ -8,11 +8,12 @@ const common = require("./webpack.common");
 module.exports = merge(common, {
     mode: "production",
     output: {
-        filename: "[name].[hash:8].bundle.js", //Damit verhindert man hashing. Nützlich bei externen libraries
+        filename: "[name].[hash:6].bundle.js", //Damit verhindert man hashing. Nützlich bei externen libraries
         path: path.resolve(__dirname, "../data"),
+        clean: true,
     },
     plugins: [
-        new MiniCssExtractPlugin({ filename: "[name].[hash:8].css" }) //Slice because SPIFFS doesn't like long filenames
+        new MiniCssExtractPlugin({ filename: "[name].[hash:6].css" }) //Slice because SPIFFS doesn't like long filenames
     ],
     module: {
         rules: [
@@ -23,6 +24,9 @@ module.exports = merge(common, {
         ],
     },
     optimization: {
+        splitChunks: {
+            chunks: 'all',
+        },
         minimize: true,
         minimizer: [
             new TerserPlugin({
