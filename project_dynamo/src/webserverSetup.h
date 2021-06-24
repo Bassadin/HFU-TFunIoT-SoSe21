@@ -77,13 +77,13 @@ void setupWiFiAndWebServer()
     server.on("/chrome-variations/seed", HTTP_ANY, [](AsyncWebServerRequest *request)
               { request->send(204); });
 
-    server.onNotFound([](AsyncWebServerRequest *request)
-                      {
-                          Serial.print(request->host());
-                          Serial.print(" - ");
-                          Serial.println(request->url());
-                          request->send(204);
-                      });
+    // server.onNotFound([](AsyncWebServerRequest *request)
+    //                   {
+    //                       Serial.print(request->host());
+    //                       Serial.print(" - ");
+    //                       Serial.println(request->url());
+    //                       request->send(204);
+    //                   });
 
     Serial.println("Starting server...");
     server.begin();
