@@ -116,7 +116,20 @@ void loop()
             lastGameDurationMilliseconds = elapsedTimeSinceGameStart;
             Serial.print("Game over! Score: ");
             Serial.println(lastGameDurationMilliseconds);
-            player.playAsync(victoryMelody);
+
+            if (lastGameDurationMilliseconds >= 0 && lastGameDurationMilliseconds < 30000)
+            {
+                player.playAsync(defeatMelody);
+            }
+            else if (lastGameDurationMilliseconds >= 30000 && lastGameDurationMilliseconds < 55000)
+            {
+                player.playAsync(silverMelody);
+            }
+            else if (lastGameDurationMilliseconds >= 55000)
+            {
+                player.playAsync(victoryMelody);
+            }
+
             changeGameState(hostingWebpageForHighscore);
         }
 
