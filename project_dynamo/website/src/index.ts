@@ -13,7 +13,7 @@ document.querySelector(".download_btn").addEventListener("click", () => {
 });
 
 window.onload = async function () {
-    let response = await fetch("https://jsonplaceholder.typicode.com/posts/42");
+    let response = await fetch("http:/kraft-test.de/lastGameScore");
     let responseText = await response.text();
     zeit = parseInt(responseText);
     zeit = 10000;
