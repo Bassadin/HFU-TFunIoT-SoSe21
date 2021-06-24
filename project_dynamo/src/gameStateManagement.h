@@ -43,8 +43,10 @@ void changeGameState(GameState newGameState)
         break;
     }
 
+    Serial.println("------------------------------");
     Serial.print("Switching to new game State: ");
     Serial.println(newGameState);
+    Serial.println("------------------------------");
     currentGameState = newGameState;
 
     //Setup for new Gamestate
