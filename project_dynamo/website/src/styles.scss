@@ -9,15 +9,25 @@
 //     font-family: roboto_reg;
 //     src: url("fonts/Roboto-Regular.ttf");
 // }
+* {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+body,
+html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
 
 body {
     text-align: center;
-    height: 100%;
 }
 h1 {
-    margin-left: 10px;
-    margin-right: 10px;
-    font-family: roboto_bold;
+    margin: .5em;
+
+    font-weight: bold;
 }
 
 .content {
@@ -27,11 +37,8 @@ h1 {
 
 .logo {
     width: 50%;
-    right: 0;
-}
-p,
-label {
-    font-family: roboto_reg;
+    left: 0;
+    margin: 1em;
 }
 
 input {
@@ -41,15 +48,15 @@ input {
 .download_btn {
     background-color: #008c58;
     position: relative;
-    padding: 15px;
+    padding: .7em;
+    font-size: 1em;
     width: 50%;
     left: 50%;
     transform: translate(-50%, 0);
-    margin-top: 15px;
+    margin-top: 2em;
     color: white;
     border: none;
     border-radius: 30px;
-    font-family: roboto_bold;
 }
 #urkunde {
     position: absolute;
@@ -61,10 +68,9 @@ input {
 }
 
 .felsen-bild {
-    position: relative;
+    position: fixed;
     bottom: 0;
+    left: 0;
     z-index: -1;
-    left: 50%;
-    transform: translate(-50%, 0);
     width: 100%;
 }
