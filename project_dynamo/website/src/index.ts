@@ -117,32 +117,32 @@ function medal(){
 		doc.addImage(felsen_comp, 'JPEG', 0, 185, 210, 120);
 		doc.setFontSize(60);
 		doc.setFont("helvetica", "normal");
-		doc.text("Urkunde", 105, 40, null, null, "center");
+		doc.text("Urkunde", 105, 40, null, "center");
 		doc.setFontSize(30);
-		doc.text("Felsen-Dominator", 105, 50, null, null, "center");
+		doc.text("Felsen-Dominator", 105, 50, null, "center");
 		
 		
-		doc.text(snal(), 105, 65, null, null, "center");
+		doc.text(snal(), 105, 65, null, "center");
 		
 		doc.setFontSize(20);
-		doc.text("hat am:", 105, 75, null, null, "center");
+		doc.text("hat am:", 105, 75, null, "center");
 		
 		doc.setFontSize(30);
-		doc.text(date(), 105, 85, null, null, "center");
+		doc.text(date(), 105, 85, null, "center");
 		
 		doc.setFontSize(20);
-		doc.text("um:", 105, 100, null, null, "center");
+		doc.text("um:", 105, 100, null, "center");
 		
 		doc.setFontSize(30);
-		doc.text(time(), 105, 110, null, null, "center");
+		doc.text(time(), 105, 110, null, "center");
 	
-		doc.text(zeit.toString(), 105, 125, null, null, "center" );
+		doc.text(zeit.toString(), 105, 125, null, "center" );
 		
 		doc.setFontSize(20);
-		doc.text("Punkte erreicht und damit", 105, 135, null, null, "center");
+		doc.text("Punkte erreicht und damit", 105, 135, null, "center");
 		
 			doc.setFontSize(20);
-		doc.text(feedbackline(), 105, 145, null, null, "center");
+		doc.text(feedbackline(), 105, 145, null, "center");
 			doc.addImage(medal(), 'JPEG', 93, 150, 25, 35);
 		
     /*doc.text(20, 20, zeit);*/
