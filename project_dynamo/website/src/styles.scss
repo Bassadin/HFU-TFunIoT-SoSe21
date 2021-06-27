@@ -67,9 +67,17 @@ input {
     left: 30px;
 }
 
+.felsen-bild-bg {
+    background-color: #1E7320;
+    position: relative;
+    bottom: 8em;
+    height: 20em;
+    z-index: -2;
+}
+
 .felsen-bild {
-    position: fixed;
-    bottom: 0;
+    position: relative;
+    bottom: 6em;
     left: 0;
     z-index: -1;
     width: 100%;
