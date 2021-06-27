@@ -10,6 +10,11 @@ module.exports = merge(common, {
         filename: "[name].bundle.js",
         path: path.resolve(__dirname, "dist"),
     },
+    devServer: {
+        host: '0.0.0.0',
+        disableHostCheck: true,
+        useLocalIp: true,
+    },
     module: {
         rules: [
             {
