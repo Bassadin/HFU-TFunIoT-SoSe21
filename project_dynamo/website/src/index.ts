@@ -13,12 +13,23 @@ document.querySelector(".download_btn").addEventListener("click", () => {
 
 window.onload = async function () {
     console.log("Zeit vor fetch: " + zeit);
-    let response = await fetch("/lastGameScore");
+    let response = await fetch_retry("/lastGameScore", 5);
     let responseText = await response.text();
     zeit = parseInt(responseText) / 1000;
     console.log("Zeit vor round: " + zeit);
     zeit = Math.round(zeit);
     console.log("Zeit nach fetch: " + zeit);
+};
+
+const fetch_retry = async (url: string, n : number) => {
+    for (let i = 0; i < n; i++) {
+        try {
+            return await fetch(url);
+        } catch (err) {
+            const isLastAttempt = i + 1 === n;
+            if (isLastAttempt) throw err;
+        }
+    }
 };
 
 function snal() {
