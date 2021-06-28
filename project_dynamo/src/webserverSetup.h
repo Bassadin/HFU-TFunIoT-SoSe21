@@ -38,6 +38,8 @@ void setupWiFiAndWebServer()
     WiFi.softAPConfig(accessPointIP, accessPointIP, subnet);
     WiFi.softAP(ssid, password);
 
+    delay(2);
+
     //Initialize SPIFFS
     if (!SPIFFS.begin())
     {
@@ -45,12 +47,16 @@ void setupWiFiAndWebServer()
         return;
     }
 
+    delay(2);
+
     //DNS Server setup
     Serial.println("Starting DNS server");
     dnsServer.setTTL(300);
     dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
     dnsServer.start(DNS_PORT, "*", accessPointIP);
     Serial.println("DNS server started");
+
+    delay(2);
 
     // Connect to Wi-Fi network with SSID and password
     Serial.println("Setting AP (Access Point)…");
@@ -89,7 +95,11 @@ void setupWiFiAndWebServer()
     //                       request->send(204);
     //                   });
 
+    delay(2);
+
     Serial.println("Starting server...");
     server.begin();
     Serial.println("Webserver setup complete.");
+
+    delay(2);
 }
